@@ -15,34 +15,38 @@ export class GenerationService {
     const delay = Math.floor(Math.random() * 2000) + 1000;
     await new Promise((resolve) => setTimeout(resolve, delay));
 
-    // Mock AI-generated flashcards based on common knowledge
-    return [
+    // For now, return mock data but use sourceText length to determine number of flashcards
+    const numberOfFlashcards = Math.min(5, Math.floor(sourceText.length / 1000));
+
+    const mockFlashcards = [
       {
         front: "What is photosynthesis?",
         back: "A process by which plants convert light energy into chemical energy to produce glucose from carbon dioxide and water",
-        source: "ai-full",
+        source: "ai-full" as const,
       },
       {
         front: "Who wrote 'Romeo and Juliet'?",
         back: "William Shakespeare wrote 'Romeo and Juliet', believed to be written between 1591 and 1595",
-        source: "ai-full",
+        source: "ai-full" as const,
       },
       {
         front: "What is the capital of France?",
         back: "Paris is the capital and largest city of France, situated on the river Seine",
-        source: "ai-full",
+        source: "ai-full" as const,
       },
       {
         front: "What is the speed of light?",
         back: "The speed of light in vacuum is approximately 299,792,458 meters per second",
-        source: "ai-full",
+        source: "ai-full" as const,
       },
       {
         front: "What is the Pythagorean theorem?",
         back: "In a right triangle, the square of the length of the hypotenuse equals the sum of squares of the other two sides (a² + b² = c²)",
-        source: "ai-full",
+        source: "ai-full" as const,
       },
     ];
+
+    return mockFlashcards.slice(0, numberOfFlashcards);
   }
 
   private async saveGeneration(params: {

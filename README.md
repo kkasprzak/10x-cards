@@ -42,7 +42,7 @@
 
    ```bash
    git clone <repository-url>
-   cd 10x-astro-starter
+   cd 10x-cards
    ```
 
 2. Install dependencies:
