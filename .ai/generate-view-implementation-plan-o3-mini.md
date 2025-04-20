@@ -157,6 +157,6 @@ Widok powinien być dostępny pod ścieżką: `/generate`.
 5. Zaimplementować funkcję wywołania API do endpointu `/generations` w momencie kliknięcia GenerateButton.
 6. Przetworzyć otrzymaną odpowiedź API oraz zaktualizować stan widoku, wyświetlając listę fiszek.
 7. Zaimplementować logikę akcji na fiszkach (akceptacja, edycja, odrzucenie) w komponencie FlashcardListItem.
-8. Dodać obsługę stanu ładowania (SkeletonLoader) oraz komunikatów o błędach (ErrorNotification).
+8. Dodać obsługę stanu ładowania (**SkeletonLoader**) oraz komunikatów o błędach (ErrorNotification).
 9. Przetestować widok pod kątem UX, walidacji oraz integracji z API.
 10. Dokonać code review i przygotować dokumentację wdrożenia. 
