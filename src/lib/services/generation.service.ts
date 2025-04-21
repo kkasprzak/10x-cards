@@ -2,51 +2,96 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FlashcardProposalDto, GenerationCreateResponseDto, Generation } from "../../types";
 import { DEFAULT_USER_ID } from "../../db/supabase.client";
 import crypto from "crypto";
+import { OpenRouterService } from "../openrouter.service";
+import { z } from "zod";
+import { LoggerService } from "./logger.service";
 
 export class GenerationService {
-  constructor(private readonly supabase: SupabaseClient) {}
+  private readonly openRouter: OpenRouterService;
+
+  constructor(
+    private readonly supabase: SupabaseClient,
+    openRouterApiKey: string = import.meta.env.OPENROUTER_API_KEY || ""
+  ) {
+    if (!openRouterApiKey) {
+      throw new Error("OpenRouter API key is required");
+    }
+    this.openRouter = new OpenRouterService(openRouterApiKey);
+    this.setupOpenRouter();
+  }
+
+  private setupOpenRouter(): void {
+    // Set system message to explain the task
+    this.openRouter.setSystemMessage(
+      "You are a flashcard generation assistant. Your task is to create educational flashcards from the provided text. " +
+        "Each flashcard should have a clear question on the front and a concise, accurate answer on the back. " +
+        "Focus on key concepts, definitions, and important relationships in the text. " +
+        "Make sure the flashcards are self-contained and understandable without additional context."
+    );
+
+    // Set response format schema for structured output
+    const flashcardSchema = {
+      type: "object",
+      properties: {
+        flashcards: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              front: {
+                type: "string",
+              },
+              back: {
+                type: "string",
+              },
+            },
+            required: ["front", "back"],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["flashcards"],
+      additionalProperties: false,
+    };
+
+    this.openRouter.setResponseFormat(flashcardSchema);
+  }
 
   private generateTextHash(text: string): string {
     return crypto.createHash("md5").update(text).digest("hex");
   }
 
   private async callExternalAIService(sourceText: string): Promise<FlashcardProposalDto[]> {
-    // Simulate network delay (1-3 seconds)
-    const delay = Math.floor(Math.random() * 2000) + 1000;
-    await new Promise((resolve) => setTimeout(resolve, delay));
+    const prompt = `Please generate educational flashcards from the following text. Focus on key concepts and important information:
 
-    // For now, return mock data but use sourceText length to determine number of flashcards
-    const numberOfFlashcards = Math.min(5, Math.floor(sourceText.length / 1000));
+${sourceText}
 
-    const mockFlashcards = [
-      {
-        front: "What is photosynthesis?",
-        back: "A process by which plants convert light energy into chemical energy to produce glucose from carbon dioxide and water",
-        source: "ai-full" as const,
-      },
-      {
-        front: "Who wrote 'Romeo and Juliet'?",
-        back: "William Shakespeare wrote 'Romeo and Juliet', believed to be written between 1591 and 1595",
-        source: "ai-full" as const,
-      },
-      {
-        front: "What is the capital of France?",
-        back: "Paris is the capital and largest city of France, situated on the river Seine",
-        source: "ai-full" as const,
-      },
-      {
-        front: "What is the speed of light?",
-        back: "The speed of light in vacuum is approximately 299,792,458 meters per second",
-        source: "ai-full" as const,
-      },
-      {
-        front: "What is the Pythagorean theorem?",
-        back: "In a right triangle, the square of the length of the hypotenuse equals the sum of squares of the other two sides (a² + b² = c²)",
-        source: "ai-full" as const,
-      },
-    ];
+Generate flashcards that capture the most important information from the text. Each flashcard should have a clear question on the front and a concise answer on the back.`;
 
-    return mockFlashcards.slice(0, numberOfFlashcards);
+    try {
+      const response = await this.openRouter.sendChatMessage(prompt);
+      const parsedResponse = JSON.parse(response.content);
+
+      // Validate the response matches our expected format
+      const flashcardSchema = z.object({
+        flashcards: z.array(
+          z.object({
+            front: z.string().min(10).max(200),
+            back: z.string().min(10).max(500),
+          })
+        ),
+      });
+
+      const validatedResponse = flashcardSchema.parse(parsedResponse);
+      // Add source: "ai-full" to each flashcard
+      const flashcardsWithSource = validatedResponse.flashcards.map((flashcard) => ({
+        ...flashcard,
+        source: "ai-full" as const,
+      }));
+      return flashcardsWithSource;
+    } catch (error) {
+      throw new Error("Failed to generate flashcards from the provided text:" + error);
+    }
   }
 
   private async saveGeneration(params: {
@@ -58,7 +103,7 @@ export class GenerationService {
       .from("generations")
       .insert({
         user_id: DEFAULT_USER_ID,
-        model: "mock-model",
+        model: this.openRouter.getModel(),
         generated_count: params.generatedCount,
         source_text_hash: this.generateTextHash(params.sourceText),
         source_text_length: params.sourceText.length,
@@ -79,7 +124,7 @@ export class GenerationService {
       user_id: DEFAULT_USER_ID,
       error_code: "GENERATION_FAILED",
       error_message: params.error instanceof Error ? params.error.message : "Unknown error",
-      model: "mock-model",
+      model: this.openRouter.getModel(),
       source_text_hash: this.generateTextHash(params.sourceText),
       source_text_length: params.sourceText.length,
     });

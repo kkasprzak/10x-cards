@@ -76,6 +76,10 @@ export class OpenRouterService {
   }
 
   // Public methods
+  public getModel(): string {
+    return this._config.model;
+  }
+
   public async sendChatMessage(message: string): Promise<ResponseType> {
     try {
       this.setUserMessage(message);
@@ -98,7 +102,6 @@ export class OpenRouterService {
   public setResponseFormat(schema: Record<string, unknown>): void {
     // Validate schema before setting
     try {
-      z.record(z.unknown()).parse(schema);
       this._config.responseFormat = {
         type: "json_schema",
         json_schema: {
@@ -107,7 +110,7 @@ export class OpenRouterService {
           schema,
         },
       };
-    } catch (error: unknown) {
+    } catch {
       throw new Error("Invalid JSON schema format");
     }
   }

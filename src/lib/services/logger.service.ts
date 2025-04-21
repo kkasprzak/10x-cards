@@ -9,8 +9,6 @@ export class LoggerService {
   private static instance: LoggerService;
   private readonly logs: LogEntry[] = [];
 
-  private constructor() {}
-
   public static getInstance(): LoggerService {
     if (!LoggerService.instance) {
       LoggerService.instance = new LoggerService();
