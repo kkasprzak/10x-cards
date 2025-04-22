@@ -21,9 +21,10 @@
 - Komponenty będą odpowiedzialne za wywoływanie endpointów API, a także aktualizację stanu interfejsu w odpowiedzi na działania użytkownika (np. przekierowanie po poprawnym logowaniu lub wyświetlenie błędu w formularzu).
 
 ### c) Scenariusze Użytkownika i Walidacja
-- Rejestracja (odniesienie do US-002 i częściowo US-003):
+- Rejestracja (odniesienie do US-001):
   * Użytkownik wypełnia formularz rejestracyjny (pola: email, hasło, potwierdzenie hasła).
   * Walidacja po stronie klienta obejmuje sprawdzenie formatu e-mail, długości hasła oraz zgodności pól haseł.
+  * Po poprawnej rejestracji, konto zostaje aktywowane, a użytkownik automatycznie logowany i przekierowywany do głównej strony aplikacji.
   * W przypadku błędów, użytkownik otrzymuje komunikaty typu:
     - "Niepoprawny format adresu e-mail"
     - "Hasło musi mieć co najmniej X znaków"
@@ -40,12 +41,14 @@
 
 - Wylogowywanie:
   * W głównym layoutcie (auth) zostanie udostępniony przycisk "Wyloguj się" (np. w prawym górnym rogu).
-  * Po kliknięciu przycisku aplikacja wywoła żądanie POST do endpointu odpowiedzialnego za zakonczenie sesji uzytkownika.
+  * Po kliknięciu przycisku aplikacja wywoła żądanie POST do endpointu odpowiedzialnego za zakończenie sesji użytkownika.
   * Po wylogowaniu użytkownik zostanie przekierowany do strony logowania.
 
 ### d) Integracja z Backendem
 - Strony Astro odpowiedzialne za routing i kontrolę dostępu będą integrować się z endpointami API autoryzacyjnymi.
 - Komponenty React wykonają asynchroniczne wywołania do endpointów (np. `/api/auth/register`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/forgot-password`), przetwarzając odpowiedzi i odpowiednio aktualizując interfejs użytkownika.
+- Dodatkowo, strony zabezpieczone muszą weryfikować ważność sesji użytkownika. W przypadku braku autoryzacji, użytkownik zostanie przekierowany do strony logowania.
+- Wszystkie endpointy API powinny weryfikować, czy operacje dotyczą danych zalogowanego użytkownika, zapewniając prywatność i bezpieczeństwo.
 
 ## 2. LOGIKA BACKENDOWA
 
