@@ -4,7 +4,6 @@ import { DEFAULT_USER_ID } from "../../db/supabase.client";
 import crypto from "crypto";
 import { OpenRouterService } from "../openrouter.service";
 import { z } from "zod";
-import { LoggerService } from "./logger.service";
 
 export class GenerationService {
   private readonly openRouter: OpenRouterService;

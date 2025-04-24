@@ -1,12 +1,49 @@
 import { useState } from "react";
+import { loginSchema } from "../../lib/services/auth.service";
+import { ErrorNotification } from "../ErrorNotification";
+import type { LoginCredentials } from "../../types";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState<LoginCredentials>({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Form submission will be handled later
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const validatedData = loginSchema.parse(formData);
+
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validatedData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+
+      // Przekierowanie po udanym logowaniu
+      window.location.href = "/generate";
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setError(null);
   };
 
   return (
@@ -17,11 +54,13 @@ export default function LoginForm() {
         </label>
         <input
           id="email"
+          name="email"
           type="email"
           required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={handleInputChange}
+          disabled={isLoading}
         />
       </div>
 
@@ -31,13 +70,17 @@ export default function LoginForm() {
         </label>
         <input
           id="password"
+          name="password"
           type="password"
           required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={formData.password}
+          onChange={handleInputChange}
+          disabled={isLoading}
         />
       </div>
+
+      {error && <ErrorNotification message={error} onClose={() => setError(null)} />}
 
       <div className="flex items-center justify-between">
         <a href="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-500">
@@ -47,9 +90,10 @@ export default function LoginForm() {
 
       <button
         type="submit"
-        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        disabled={isLoading}
+        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Sign in
+        {isLoading ? "Signing in..." : "Sign in"}
       </button>
 
       <div className="text-center">
