@@ -1,0 +1,18 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t py-8 mt-8">
+  <div class="container mx-auto px-4">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-sm text-muted-foreground">
+        © {currentYear} 10x Cards. All rights reserved.
+      </div>
+      <nav class="flex gap-4 text-sm">
+        <a href="/about" class="text-muted-foreground hover:text-foreground">About</a>
+        <a href="/privacy" class="text-muted-foreground hover:text-foreground">Privacy</a>
+        <a href="/terms" class="text-muted-foreground hover:text-foreground">Terms</a>
+      </nav>
+    </div>
+  </div>
+</footer>

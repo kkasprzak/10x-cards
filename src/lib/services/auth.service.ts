@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/db/database.types";
 import type { LoginCredentials, AuthResponse } from "../../types";
 
 export const loginSchema = z.object({
@@ -8,7 +9,7 @@ export const loginSchema = z.object({
 });
 
 export class AuthService {
-  constructor(private supabase: SupabaseClient) {}
+  constructor(private readonly supabase: SupabaseClient<Database>) {}
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const { data, error } = await this.supabase.auth.signInWithPassword(credentials);
@@ -31,5 +32,17 @@ export class AuthService {
         email: data.user.email,
       },
     };
+  }
+
+  /**
+   * Signs out the current user and clears the session
+   * @throws Error if the sign out operation fails
+   */
+  async logout(): Promise<void> {
+    const { error } = await this.supabase.auth.signOut();
+
+    if (error) {
+      throw new Error("Failed to sign out");
+    }
   }
 }

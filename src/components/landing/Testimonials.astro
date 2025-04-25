@@ -1,0 +1,96 @@
+---
+const testimonials = [
+  {
+    name: "Anna Kowalska",
+    role: "Studentka medycyny",
+    content:
+      "Dzięki 10x Cards zaoszczędzam mnóstwo czasu na tworzeniu fiszek. AI świetnie wyłapuje najważniejsze informacje z moich notatek i podręczników.",
+    image: "https://robohash.org/anna_kowalska.png",
+  },
+  {
+    name: "Piotr Nowak",
+    role: "Nauczyciel języka angielskiego",
+    content:
+      "Używam 10x Cards do przygotowywania materiałów dla moich uczniów. Automatyczne generowanie fiszek z tekstów znacznie przyspiesza moją pracę.",
+    image: "https://robohash.org/piotr_nowak.png",
+  },
+  {
+    name: "Marta Wiśniewska",
+    role: "Programistka",
+    content:
+      "Świetne narzędzie do nauki nowych technologii. Wklejam dokumentację i od razu mam gotowe fiszki do nauki. Algorytm powtórek działa perfekcyjnie.",
+    image: "https://robohash.org/marta_wisniewska.png",
+  },
+  {
+    name: "Tomasz Zieliński",
+    role: "Student prawa",
+    content:
+      "Nauka kodeksów i przepisów nigdy nie była tak efektywna. AI pomaga mi tworzyć precyzyjne fiszki z najważniejszych definicji i procedur.",
+    image: "https://robohash.org/tomasz_zielinski.png",
+  },
+  {
+    name: "Karolina Dąbrowska",
+    role: "Lekarka",
+    content:
+      "Używam 10x Cards do przygotowań do egzaminów specjalizacyjnych. Oszczędza mi to godziny na tworzeniu notatek, mogę skupić się na samej nauce.",
+    image: "https://robohash.org/karolina_dabrowska.png",
+  },
+  {
+    name: "Michał Adamczyk",
+    role: "Student historii",
+    content:
+      "Aplikacja świetnie radzi sobie z generowaniem fiszek z długich tekstów historycznych. Pomaga mi to w zapamiętywaniu dat i wydarzeń.",
+    image: "https://robohash.org/michal_adamczyk.png",
+  },
+  {
+    name: "Aleksandra Pawlak",
+    role: "Nauczycielka biologii",
+    content:
+      "Tworzę zestawy fiszek dla moich uczniów. AI doskonale wychwytuje kluczowe pojęcia i procesy biologiczne, oszczędzając mi mnóstwo czasu.",
+    image: "https://robohash.org/aleksandra_pawlak.png",
+  },
+  {
+    name: "Krzysztof Wójcik",
+    role: "Student informatyki",
+    content:
+      "Algorytm powtórek jest świetnie zoptymalizowany. Pomaga mi skutecznie przyswajać nowe koncepcje programowania i wzorce projektowe.",
+    image: "https://robohash.org/krzysztof_wojcik.png",
+  },
+  {
+    name: "Magdalena Lewandowska",
+    role: "Studentka farmacji",
+    content:
+      "Niesamowite narzędzie do nauki nazw leków i związków chemicznych. AI tworzy precyzyjne fiszki, a system powtórek pomaga w ich zapamiętaniu.",
+    image: "https://robohash.org/magdalena_lewandowska.png",
+  },
+];
+---
+
+<section class="bg-white py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-xl text-center">
+      <h2 class="text-lg font-semibold leading-8 tracking-tight text-primary">Opinie użytkowników</h2>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Przekonaj się, co mówią inni</p>
+    </div>
+    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:max-w-none">
+      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          testimonials.map((testimonial) => (
+            <figure class="rounded-2xl bg-gray-50 p-8 text-sm leading-6">
+              <blockquote class="text-gray-900">
+                <p>"{testimonial.content}"</p>
+              </blockquote>
+              <figcaption class="mt-6 flex items-center gap-x-4">
+                <img class="h-10 w-10 rounded-full bg-gray-50" src={testimonial.image} alt={testimonial.name} />
+                <div>
+                  <div class="font-semibold text-gray-900">{testimonial.name}</div>
+                  <div class="text-gray-600">{testimonial.role}</div>
+                </div>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
