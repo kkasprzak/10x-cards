@@ -1,16 +1,14 @@
 ---
 import "../styles/global.css";
-import { Button } from "@/components/ui/button";
-import { ViewTransitions } from "astro:transitions";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 
 interface Props {
   title?: string;
+  isMinimal?: boolean;
 }
 
-const { title = "10x Astro Starter" } = Astro.props;
-const user = Astro.locals.user;
+const { title = "10x Astro Starter", isMinimal = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -23,11 +21,11 @@ const user = Astro.locals.user;
     <title>{title}</title>
   </head>
   <body class="min-h-full flex flex-col bg-background text-foreground">
-    <Header />
+    <Header showAuthButtons={!isMinimal} />
     <main class="flex-1">
       <slot />
     </main>
-    <Footer />
+    {!isMinimal && <Footer />}
   </body>
 </html>
 
