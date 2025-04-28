@@ -1,15 +1,16 @@
 ---
-import AuthLayout from "../layouts/AuthLayout.astro";
+import Layout from "../layouts/Layout.astro";
 import RegisterForm from "../components/auth/RegisterForm";
 ---
 
-<AuthLayout title="Register">
-  <div class="text-center mb-8">
-    <h2 class="text-3xl font-bold text-gray-900">Create an account</h2>
-    <p class="mt-2 text-sm text-gray-600">
-      Or <a href="/login" class="font-medium text-indigo-600 hover:text-indigo-500">sign in to your account</a>
-    </p>
-  </div>
+<Layout title="Register" isMinimal>
+  <div class="flex-1 flex flex-col items-center justify-center py-16 px-4 min-h-[calc(100vh-4rem)]">
+    <div class="w-full max-w-[450px] p-8 bg-card rounded-lg border shadow-sm">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-900">Register</h2>
+      </div>
 
-  <RegisterForm client:load />
-</AuthLayout>
+      <RegisterForm client:load />
+    </div>
+  </div>
+</Layout>

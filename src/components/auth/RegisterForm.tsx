@@ -1,20 +1,63 @@
 import { useState } from "react";
+import { registerSchema } from "../../lib/services/auth.service";
+import type { RegisterCredentials } from "../../types";
 
 export default function RegisterForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState<RegisterCredentials>({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
+    setError(null);
+
+    // Client-side validation
+    const result = registerSchema.safeParse(formData);
+    if (!result.success) {
+      setError(result.error.issues[0].message);
       return;
     }
-    setError("");
-    // Form submission will be handled later
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Registration failed");
+        return;
+      }
+
+      setSuccess(true);
+      setFormData({ email: "", password: "", confirmPassword: "" });
+    } catch {
+      setError("An error occurred during registration");
+    }
   };
+
+  if (success) {
+    return (
+      <div className="text-center">
+        <h3 className="text-xl font-semibold text-green-600 mb-4">Account created successfully!</h3>
+        <a
+          href="/login"
+          className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+        >
+          Sign in
+        </a>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -27,8 +70,8 @@ export default function RegisterForm() {
           type="email"
           required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
       </div>
 
@@ -41,8 +84,8 @@ export default function RegisterForm() {
           type="password"
           required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         />
       </div>
 
@@ -55,12 +98,12 @@ export default function RegisterForm() {
           type="password"
           required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          value={formData.confirmPassword}
+          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
         />
       </div>
 
-      {error && <div className="text-red-500 text-sm">{error}</div>}
+      {error && <div className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md p-3">{error}</div>}
 
       <button
         type="submit"
