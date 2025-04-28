@@ -6,9 +6,10 @@ import Footer from "../components/Footer.astro";
 interface Props {
   title?: string;
   isMinimal?: boolean;
+  isAuthenticated?: boolean;
 }
 
-const { title = "10x Astro Starter", isMinimal = false } = Astro.props;
+const { title = "10x Astro Starter", isMinimal = false, isAuthenticated = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -21,7 +22,7 @@ const { title = "10x Astro Starter", isMinimal = false } = Astro.props;
     <title>{title}</title>
   </head>
   <body class="min-h-full flex flex-col bg-background text-foreground">
-    <Header showAuthButtons={!isMinimal} />
+    <Header variant={isMinimal ? "minimal" : "full"} isAuthenticated={isAuthenticated} />
     <main class="flex-1">
       <slot />
     </main>

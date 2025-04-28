@@ -2,24 +2,35 @@
 import { Button } from "@/components/ui/button";
 
 interface Props {
-  showAuthButtons?: boolean;
+  variant: "minimal" | "full";
+  isAuthenticated?: boolean;
 }
 
-const { showAuthButtons = true } = Astro.props;
+const { variant, isAuthenticated = false } = Astro.props;
 ---
 
 <header class="border-b">
   <nav class="container mx-auto px-4 h-16 flex items-center justify-between">
     <a href="/" class="font-semibold text-lg">10x Cards</a>
     {
-      showAuthButtons && (
+      variant === "full" && (
         <div class="space-x-2">
-          <a href="/login">
-            <Button variant="ghost">Login</Button>
-          </a>
-          <a href="/register">
-            <Button>Sign up</Button>
-          </a>
+          {!isAuthenticated ? (
+            <>
+              <a href="/login">
+                <Button variant="ghost">Login</Button>
+              </a>
+              <a href="/register">
+                <Button>Sign up</Button>
+              </a>
+            </>
+          ) : (
+            <form method="POST" action="/api/auth/logout">
+              <Button type="submit" variant="ghost">
+                Logout
+              </Button>
+            </form>
+          )}
         </div>
       )
     }
