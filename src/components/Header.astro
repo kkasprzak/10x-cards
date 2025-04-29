@@ -1,5 +1,6 @@
 ---
 import { Button } from "@/components/ui/button";
+import { LogoutButton } from "@/components/LogoutButton";
 
 interface Props {
   variant: "minimal" | "full";
@@ -25,11 +26,7 @@ const { variant, isAuthenticated = false } = Astro.props;
               </a>
             </>
           ) : (
-            <form method="POST" action="/api/auth/logout">
-              <Button type="submit" variant="ghost">
-                Logout
-              </Button>
-            </form>
+            <LogoutButton client:load />
           )}
         </div>
       )
