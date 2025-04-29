@@ -1,6 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FlashcardCreateDto, FlashcardDto } from "../../types";
-import { DEFAULT_USER_ID } from "../../db/supabase.client";
 
 export interface FlashcardCreationResult {
   success: FlashcardDto[];
@@ -11,7 +10,10 @@ export interface FlashcardCreationResult {
 }
 
 export class FlashcardService {
-  constructor(private readonly supabase: SupabaseClient) {}
+  constructor(
+    private readonly supabase: SupabaseClient,
+    private readonly userId: string
+  ) {}
 
   async createFlashcards(flashcards: FlashcardCreateDto[]): Promise<FlashcardCreationResult> {
     const result: FlashcardCreationResult = {
@@ -26,7 +28,7 @@ export class FlashcardService {
           .from("flashcards")
           .insert({
             ...flashcard,
-            user_id: DEFAULT_USER_ID,
+            user_id: this.userId,
           })
           .select()
           .single();

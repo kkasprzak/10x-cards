@@ -6,6 +6,20 @@ export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    // Ensure user is authenticated
+    if (!locals.user?.id) {
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "You must be logged in to create flashcards",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     const body = await request.json();
 
     // Validate input data
@@ -23,7 +37,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    const flashcardService = new FlashcardService(locals.supabase);
+    const flashcardService = new FlashcardService(locals.supabase, locals.user.id);
     const result = await flashcardService.createFlashcards(validationResult.data.flashcards);
 
     // If some flashcards failed to create, return 207 Multi-Status

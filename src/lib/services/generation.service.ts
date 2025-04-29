@@ -1,6 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FlashcardProposalDto, GenerationCreateResponseDto, Generation } from "../../types";
-import { DEFAULT_USER_ID } from "../../db/supabase.client";
 import crypto from "crypto";
 import { OpenRouterService } from "../openrouter.service";
 import { z } from "zod";
@@ -10,6 +9,7 @@ export class GenerationService {
 
   constructor(
     private readonly supabase: SupabaseClient,
+    private readonly userId: string,
     openRouterApiKey: string = import.meta.env.OPENROUTER_API_KEY || ""
   ) {
     if (!openRouterApiKey) {
@@ -101,7 +101,7 @@ Generate flashcards that capture the most important information from the text. E
     const { data: generation, error: insertError } = await this.supabase
       .from("generations")
       .insert({
-        user_id: DEFAULT_USER_ID,
+        user_id: this.userId,
         model: this.openRouter.getModel(),
         generated_count: params.generatedCount,
         source_text_hash: this.generateTextHash(params.sourceText),
@@ -120,7 +120,7 @@ Generate flashcards that capture the most important information from the text. E
 
   private async logGenerationError(params: { sourceText: string; error: unknown }): Promise<void> {
     await this.supabase.from("generation_error_logs").insert({
-      user_id: DEFAULT_USER_ID,
+      user_id: this.userId,
       error_code: "GENERATION_FAILED",
       error_message: params.error instanceof Error ? params.error.message : "Unknown error",
       model: this.openRouter.getModel(),
