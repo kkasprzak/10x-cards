@@ -48,8 +48,10 @@ export function FlashcardListItem({ flashcard, onAccept, onEdit, onReject }: Fla
 
   return (
     <>
-      <Card className={`${flashcard.accepted ? "border-green-500" : flashcard.edited ? "border-blue-500" : ""}`}>
-        <CardContent className="pt-6">
+      <Card
+        className={`flex flex-col min-h-[300px] ${flashcard.accepted ? "border-green-500" : flashcard.edited ? "border-blue-500" : ""}`}
+      >
+        <CardContent className="flex-1 pt-6">
           <div className="space-y-4">
             <div>
               <h3 className="font-medium mb-2">Front</h3>
@@ -61,7 +63,7 @@ export function FlashcardListItem({ flashcard, onAccept, onEdit, onReject }: Fla
             </div>
           </div>
         </CardContent>
-        <CardFooter className="justify-end space-x-2">
+        <CardFooter className="justify-end space-x-2 border-t pt-4">
           <Button variant={flashcard.accepted ? "default" : "outline"} size="sm" onClick={onAccept} className="w-24">
             <Check className="mr-2 h-4 w-4" />
             {flashcard.accepted ? "Accepted" : "Accept"}

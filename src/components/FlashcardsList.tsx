@@ -10,7 +10,7 @@ interface FlashcardsListProps {
 
 export function FlashcardsList({ flashcards, onAccept, onEdit, onReject }: FlashcardsListProps) {
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-2 gap-4">
       {flashcards.map((flashcard, index) => (
         <FlashcardListItem
           key={index}
