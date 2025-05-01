@@ -54,25 +54,26 @@ export function FlashcardListItem({ flashcard, onAccept, onEdit, onReject }: Fla
         <CardContent className="flex-1 pt-6">
           <div className="space-y-4">
             <div>
-              <h3 className="font-medium mb-2">Front</h3>
-              <p className="text-sm">{flashcard.front}</p>
-            </div>
-            <div>
-              <h3 className="font-medium mb-2">Back</h3>
-              <p className="text-sm">{flashcard.back}</p>
+              <h3 className="text-lg font-semibold mb-1">{flashcard.front}</h3>
+              <p className="text-sm text-gray-600">{flashcard.back}</p>
             </div>
           </div>
         </CardContent>
-        <CardFooter className="justify-end space-x-2 border-t pt-4">
-          <Button variant={flashcard.accepted ? "default" : "outline"} size="sm" onClick={onAccept} className="w-24">
+        <CardFooter className="grid grid-cols-3 gap-2 p-4">
+          <Button variant="ghost" size="sm" onClick={onAccept} className="text-gray-600 hover:text-gray-900">
             <Check className="mr-2 h-4 w-4" />
             {flashcard.accepted ? "Accepted" : "Accept"}
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="w-24">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsEditing(true)}
+            className="text-gray-600 hover:text-gray-900"
+          >
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Button>
-          <Button variant="outline" size="sm" onClick={onReject} className="w-24">
+          <Button variant="ghost" size="sm" onClick={onReject} className="text-gray-600 hover:text-gray-900">
             <X className="mr-2 h-4 w-4" />
             Reject
           </Button>
