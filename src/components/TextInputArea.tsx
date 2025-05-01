@@ -1,5 +1,4 @@
 import { Textarea } from "./ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import type { ChangeEvent } from "react";
 
 interface TextInputAreaProps {
@@ -18,18 +17,18 @@ export function TextInputArea({ value, onChange, disabled }: TextInputAreaProps)
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Enter your text</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="rounded-lg border border-slate-200 bg-slate-50 shadow-sm hover:border-slate-300 transition-colors">
+      <div className="px-6 py-4 border-b border-slate-200">
+        <h2 className="text-lg font-semibold text-slate-900">Enter your text</h2>
+      </div>
+      <div className="p-6">
         <div className="space-y-4">
           <Textarea
             placeholder="Enter text to generate flashcards (minimum 1000 characters, maximum 10000 characters)"
             value={value}
             onChange={handleChange}
             disabled={disabled}
-            className="min-h-[200px]"
+            className="min-h-[200px] bg-white"
           />
           <div className="text-sm text-gray-500 flex justify-between">
             <span>Characters: {characterCount}/10000</span>
@@ -42,7 +41,7 @@ export function TextInputArea({ value, onChange, disabled }: TextInputAreaProps)
             )}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
