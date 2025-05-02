@@ -29,7 +29,7 @@ export function TextInputArea({ value, onChange, disabled, onGenerate, isGenerat
           value={value}
           onChange={handleChange}
           disabled={disabled}
-          className="mt-1 block w-full px-3 py-2 min-h-[200px] border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white"
+          className="mt-1 block min-h-[200px]"
         />
         <div className="flex items-center justify-between mt-2">
           <div className="text-sm text-gray-500">
