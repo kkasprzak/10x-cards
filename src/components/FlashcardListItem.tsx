@@ -60,20 +60,15 @@ export function FlashcardListItem({ flashcard, onAccept, onEdit, onReject }: Fla
           </div>
         </CardContent>
         <CardFooter className="grid grid-cols-3 gap-2 p-4">
-          <Button variant="ghost" size="sm" onClick={onAccept} className="text-gray-600 hover:text-gray-900">
+          <Button variant="ghost" size="sm" onClick={onAccept}>
             <Check className="mr-2 h-4 w-4" />
             {flashcard.accepted ? "Accepted" : "Accept"}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsEditing(true)}
-            className="text-gray-600 hover:text-gray-900"
-          >
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Button>
-          <Button variant="ghost" size="sm" onClick={onReject} className="text-gray-600 hover:text-gray-900">
+          <Button variant="ghost" size="sm" onClick={onReject}>
             <X className="mr-2 h-4 w-4" />
             Reject
           </Button>
@@ -122,7 +117,9 @@ export function FlashcardListItem({ flashcard, onAccept, onEdit, onReject }: Fla
             <Button variant="outline" onClick={handleCancelEdit}>
               Cancel
             </Button>
-            <Button onClick={handleSaveEdit}>Save Changes</Button>
+            <Button variant="default" onClick={handleSaveEdit}>
+              Save Changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

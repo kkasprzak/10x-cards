@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { registerSchema } from "../../lib/services/auth.service";
+import { Button } from "../ui/button";
 import type { RegisterCredentials } from "../../types";
 
 export default function RegisterForm() {
@@ -105,12 +106,9 @@ export default function RegisterForm() {
 
       {error && <div className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md p-3">{error}</div>}
 
-      <button
-        type="submit"
-        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
+      <Button type="submit" variant="default" className="w-full">
         Sign up
-      </button>
+      </Button>
 
       <div className="text-center">
         <a href="/login" className="text-sm text-indigo-600 hover:text-indigo-500">

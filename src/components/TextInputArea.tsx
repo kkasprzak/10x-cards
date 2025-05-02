@@ -45,7 +45,8 @@ export function TextInputArea({ value, onChange, disabled, onGenerate, isGenerat
           <Button
             onClick={onGenerate}
             disabled={!isValid || isGenerating || disabled}
-            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white"
+            variant="default"
+            className="w-full sm:w-auto"
           >
             {isGenerating && <Loader2 className="animate-spin" />}
             {isGenerating ? "Generating..." : "Generate Flashcards"}
