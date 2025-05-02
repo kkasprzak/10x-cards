@@ -23,7 +23,7 @@ const { title = "10x Astro Starter", isMinimal = false, isAuthenticated = false 
   </head>
   <body class="min-h-full flex flex-col bg-background text-foreground">
     <Header variant={isMinimal ? "minimal" : "full"} isAuthenticated={isAuthenticated} />
-    <main class="flex-1">
+    <main class="flex-1 bg-gray-100">
       <slot />
     </main>
     {!isMinimal && <Footer />}

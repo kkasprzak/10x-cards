@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type { FlashcardProposalDto, GenerationCreateResponseDto } from "../types";
 import { TextInputArea } from "./TextInputArea";
-import { GenerateButton } from "./GenerateButton";
 import { FlashcardsList } from "./FlashcardsList";
 import { SkeletonLoader } from "./SkeletonLoader";
 import { ErrorNotification } from "./ErrorNotification";
@@ -92,12 +91,12 @@ export function FlashcardGenerationView() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <TextInputArea value={textInput} onChange={handleTextChange} disabled={isLoading} />
-
-      <GenerateButton
-        onClick={handleGenerate}
-        disabled={textInput.length < 1000 || textInput.length > 10000 || isLoading}
-        isLoading={isLoading}
+      <TextInputArea
+        value={textInput}
+        onChange={handleTextChange}
+        disabled={isLoading}
+        onGenerate={handleGenerate}
+        isGenerating={isLoading}
       />
 
       {isLoading && <SkeletonLoader />}
