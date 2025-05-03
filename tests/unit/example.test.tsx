@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
 
 // This is a placeholder test until we have actual components to test
 describe("Example test", () => {

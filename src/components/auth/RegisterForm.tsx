@@ -61,7 +61,7 @@ export default function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form noValidate onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
           Email
@@ -104,7 +104,11 @@ export default function RegisterForm() {
         />
       </div>
 
-      {error && <div className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md p-3">{error}</div>}
+      {error && (
+        <div data-testid="form-error" className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md p-3">
+          {error}
+        </div>
+      )}
 
       <Button type="submit" variant="default" className="w-full">
         Sign up
