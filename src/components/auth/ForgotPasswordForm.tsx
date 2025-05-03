@@ -1,13 +1,36 @@
 import { useState } from "react";
+import { z } from "zod";
+import { ErrorNotification } from "../ErrorNotification";
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email format"),
+});
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    // Form submission will be handled later
+    setError(null);
+
+    try {
+      forgotPasswordSchema.parse({ email });
+      setSubmitted(true);
+      // Form submission will be handled later
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setError(err.errors[0].message);
+      } else {
+        setError("An unexpected error occurred");
+      }
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    setError(null);
   };
 
   if (submitted) {
@@ -25,7 +48,7 @@ export default function ForgotPasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form noValidate onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
           Email address
@@ -36,9 +59,11 @@ export default function ForgotPasswordForm() {
           required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={handleInputChange}
         />
       </div>
+
+      {error && <ErrorNotification message={error} onClose={() => setError(null)} />}
 
       <button
         type="submit"
