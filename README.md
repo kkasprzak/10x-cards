@@ -25,6 +25,14 @@
 **AI Integration:**
 - Openrouter.ai (access to multiple LLM models for flashcard generation)
 
+**Testing:**
+- Vitest + React Testing Library (unit and integration tests)
+- Playwright Test (end-to-end tests)
+- MSW (API mocking)
+- Supabase Local Development (backend testing)
+- k6 + Lighthouse CI (performance testing)
+- OWASP ZAP, Snyk (security testing)
+
 **CI/CD & Hosting:**
 - GitHub Actions for CI/CD pipelines
 - DigitalOcean (Docker-based deployment)
