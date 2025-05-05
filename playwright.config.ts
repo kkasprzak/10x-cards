@@ -1,4 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -8,7 +12,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [["html", { open: "never" }], ["list"]],
   use: {
-    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3001",
+    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -19,8 +23,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev:e2e",
-    url: "http://localhost:3001",
+    command: "npm run dev",
+    url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     stdout: "pipe",
     stderr: "pipe",
