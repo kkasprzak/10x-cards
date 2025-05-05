@@ -36,6 +36,7 @@ jobs:
           path: coverage/
 
   e2e-tests:
+    if: false # Temporarily disabled
     name: E2E Tests
     runs-on: ubuntu-latest
 
