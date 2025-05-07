@@ -1,6 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FlashcardProposalDto, GenerationCreateResponseDto, Generation } from "../../types";
-import crypto from "crypto";
 import { OpenRouterService } from "../openrouter.service";
 import { z } from "zod";
 import { OPENROUTER_API_KEY } from "astro:env/server";
@@ -57,8 +56,12 @@ export class GenerationService {
     this.openRouter.setResponseFormat(flashcardSchema);
   }
 
-  private generateTextHash(text: string): string {
-    return crypto.createHash("md5").update(text).digest("hex");
+  private async generateTextHash(text: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
   private async callExternalAIService(sourceText: string): Promise<FlashcardProposalDto[]> {
@@ -99,13 +102,14 @@ Generate flashcards that capture the most important information from the text. E
     generatedCount: number;
     generationDuration: number;
   }): Promise<Generation> {
+    const textHash = await this.generateTextHash(params.sourceText);
     const { data: generation, error: insertError } = await this.supabase
       .from("generations")
       .insert({
         user_id: this.userId,
         model: this.openRouter.getModel(),
         generated_count: params.generatedCount,
-        source_text_hash: this.generateTextHash(params.sourceText),
+        source_text_hash: textHash,
         source_text_length: params.sourceText.length,
         generation_duration: params.generationDuration,
       })
@@ -120,12 +124,13 @@ Generate flashcards that capture the most important information from the text. E
   }
 
   private async logGenerationError(params: { sourceText: string; error: unknown }): Promise<void> {
+    const textHash = await this.generateTextHash(params.sourceText);
     await this.supabase.from("generation_error_logs").insert({
       user_id: this.userId,
       error_code: "GENERATION_FAILED",
       error_message: params.error instanceof Error ? params.error.message : "Unknown error",
       model: this.openRouter.getModel(),
-      source_text_hash: this.generateTextHash(params.sourceText),
+      source_text_hash: textHash,
       source_text_length: params.sourceText.length,
     });
   }
