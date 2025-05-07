@@ -1,62 +1,66 @@
-name: Test and Build
+name: Deploy to Cloudflare Pages
 
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
 
 jobs:
-  unit-tests:
-    name: Unit Tests
+  test:
+    name: 🧪 Test
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version-file: ".nvmrc"
           cache: "npm"
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Run linter
+        run: npm run lint
 
       - name: Run unit tests
-        run: npm test
+        run: npm run test
 
-      - name: Run test coverage
-        run: npm run test:coverage
+      - name: Run type check
+        run: npm run typecheck
 
-      - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage/
-
-  build:
-    name: Build Application
-    needs: unit-tests
+  deploy:
+    name: 🚀 Deploy
+    needs: [test]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    environment: production
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version-file: ".nvmrc"
           cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build application
+      - name: Build project
         run: npm run build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
         with:
-          name: build-output
-          path: dist/
-          retention-days: 7
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=10x-cards
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

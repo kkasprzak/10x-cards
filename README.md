@@ -35,7 +35,7 @@
 
 **CI/CD & Hosting:**
 - GitHub Actions for CI/CD pipelines
-- DigitalOcean (Docker-based deployment)
+- Cloudflare Pages for production deployment
 
 ## Getting Started Locally
 
