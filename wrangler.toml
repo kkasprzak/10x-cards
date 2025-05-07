@@ -1,0 +1,6 @@
+name = "10x-cards"
+compatibility_date = "2024-05-07"
+
+kv_namespaces = [
+    { binding = "SESSION", id = "85ae052787c1485e9d106b23065f84e3", preview_id = "85ae052787c1485e9d106b23065f84e3" },
+]
