@@ -3,6 +3,7 @@ import type { FlashcardProposalDto, GenerationCreateResponseDto, Generation } fr
 import crypto from "crypto";
 import { OpenRouterService } from "../openrouter.service";
 import { z } from "zod";
+import { OPENROUTER_API_KEY } from "astro:env/server";
 
 export class GenerationService {
   private readonly openRouter: OpenRouterService;
@@ -10,7 +11,7 @@ export class GenerationService {
   constructor(
     private readonly supabase: SupabaseClient,
     private readonly userId: string,
-    openRouterApiKey: string = import.meta.env.OPENROUTER_API_KEY || ""
+    openRouterApiKey: string = OPENROUTER_API_KEY
   ) {
     if (!openRouterApiKey) {
       throw new Error("OpenRouter API key is required");

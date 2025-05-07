@@ -2,9 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createServerClient, type CookieOptionsWithName } from "@supabase/ssr";
 import type { AstroCookies } from "astro";
 import type { Database } from "./database.types";
-
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
+import { SUPABASE_URL, SUPABASE_KEY } from "astro:env/server";
 
 export const DEFAULT_USER_ID = "b8608e81-0e6b-41f9-828c-e2622eaf41e1";
 
@@ -29,7 +27,7 @@ function parseCookieHeader(cookieHeader: string): { name: string; value: string 
 }
 
 export const createSupabaseServerClient = (context: { headers: Headers; cookies: AstroCookies }) => {
-  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+  return createServerClient<Database>(SUPABASE_URL, SUPABASE_KEY, {
     cookieOptions,
     cookies: {
       getAll() {
@@ -42,4 +40,4 @@ export const createSupabaseServerClient = (context: { headers: Headers; cookies:
   });
 };
 
-export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
+export const supabaseClient = createClient<Database>(SUPABASE_URL, SUPABASE_KEY);

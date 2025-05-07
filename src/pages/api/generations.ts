@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import type { GenerateFlashcardsCommand } from "../../types";
 import { GenerationService } from "../../lib/services/generation.service";
+import { OPENROUTER_API_KEY } from "astro:env/server";
 
 // Input validation schema
 const generateFlashcardsSchema = z.object({
@@ -45,11 +46,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Initialize generation service and process request
-    const generationService = new GenerationService(
-      locals.supabase,
-      locals.user.id,
-      import.meta.env.OPENROUTER_API_KEY
-    );
+    const generationService = new GenerationService(locals.supabase, locals.user.id, OPENROUTER_API_KEY);
     const result = await generationService.generateFlashcards(validationResult.data.source_text);
 
     return new Response(JSON.stringify(result), {
