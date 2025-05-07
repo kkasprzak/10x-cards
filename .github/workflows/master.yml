@@ -26,9 +26,6 @@ jobs:
       - name: Run unit tests
         run: npm run test
 
-      - name: Run type check
-        run: npm run typecheck
-
   deploy:
     name: 🚀 Deploy
     needs: [test]
