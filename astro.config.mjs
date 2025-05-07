@@ -14,8 +14,5 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  adapter: cloudflare({
-    mode: "directory",
-    functionPerRoute: true,
-  }),
+  adapter: cloudflare(),
 });

@@ -1,5 +1,5 @@
 import { renderHook } from "@testing-library/react";
-import type { ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode, ElementType } from "react";
 import { vi } from "vitest";
 
 // Utility for mocking fetch API
@@ -19,7 +19,8 @@ export const createTestWrapper = (providers: ReactElement[]) => {
     return providers.reduce(
       (acc, Provider) => {
         const { type: ProviderComponent, props } = Provider;
-        return <ProviderComponent {...props}>{acc}</ProviderComponent>;
+        const Component = ProviderComponent as ElementType;
+        return <Component {...(props as Record<string, unknown>)}>{acc}</Component>;
       },
       <>{children}</>
     );
