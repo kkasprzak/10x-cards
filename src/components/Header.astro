@@ -18,7 +18,7 @@ const { variant, isAuthenticated = false } = Astro.props;
         <div class="space-x-2">
           {!isAuthenticated ? (
             <>
-              <a href="/login">
+              <a href="/login" data-test-id="header-login-button">
                 <Button variant="ghost">Login</Button>
               </a>
               <a href="/register">

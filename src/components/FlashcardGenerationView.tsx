@@ -90,13 +90,14 @@ export function FlashcardGenerationView() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6" data-testid="flashcard-generation-view">
       <TextInputArea
         value={textInput}
         onChange={handleTextChange}
         disabled={isLoading}
         onGenerate={handleGenerate}
         isGenerating={isLoading}
+        data-testid="text-input-area"
       />
 
       {isLoading && <SkeletonLoader />}
@@ -117,12 +118,14 @@ export function FlashcardGenerationView() {
             onAccept={handleAccept}
             onEdit={handleEdit}
             onReject={handleReject}
+            data-testid="flashcards-list"
           />
 
           <BulkSaveButton
             flashcards={flashcardProposals.filter((p) => p.accepted)}
             generationId={generationId || 0}
             onSuccess={handleSaveSuccess}
+            data-testid="bulk-save-button"
           />
         </>
       )}
