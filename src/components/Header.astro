@@ -10,7 +10,7 @@ interface Props {
 const { variant, isAuthenticated = false } = Astro.props;
 ---
 
-<header class="border-b">
+<header class="border-b" data-testid="header">
   <nav class="container mx-auto px-4 h-16 flex items-center justify-between">
     <a href="/" class="font-semibold text-lg">10x Cards</a>
     {

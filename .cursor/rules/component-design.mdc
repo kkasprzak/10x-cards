@@ -3,3 +3,82 @@ description:
 globs:
 alwaysApply: false
 ---
+# Component Design Guidelines
+
+## Analysis Before Implementation
+
+Before implementing any new component or feature:
+
+1. **Review Existing Components**
+   - Check [src/components/ui](mdc:src/components/ui) for existing base components
+   - Understand available variant systems (cva patterns)
+   - Review how similar components are implemented
+
+2. **Identify Patterns**
+   - Look for repeated styles and behaviors
+   - Check if existing variants cover your needs
+   - Consider if new variants are needed
+
+## Component Implementation Rules
+
+### Using the Variant System
+
+1. **Prefer Variants Over Direct Styles**
+   ```tsx
+   // ❌ Don't use direct styles
+   <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
+     Submit
+   </Button>
+
+   // ✅ Use variants
+   <Button variant="default">
+     Submit
+   </Button>
+   ```
+
+2. **Extend Only When Necessary**
+   - Only add custom classes for truly unique needs
+   - If a style is used in multiple places, consider adding a new variant
+   ```tsx
+   // ✅ Combining variant with specific layout needs
+   <Button variant="default" className="w-full sm:w-auto">
+     Submit
+   </Button>
+   ```
+
+### Component Organization
+
+1. **Maintain Orthogonality**
+   - Keep variants independent of each other
+   - Separate concerns: appearance (variant) vs size vs state
+   - Define shared styles in the base component
+
+2. **Style Management**
+   - Define core styles in the base component
+   - Use variants for different visual styles
+   - Use size props for dimension variations
+   - Handle states (hover, focus, disabled) at the variant level
+
+### Best Practices
+
+1. **DRY (Don't Repeat Yourself)**
+   - Reuse existing variants when possible
+   - Create new variants for repeated patterns
+   - Avoid copying styles between components
+
+2. **Consistency**
+   - Use the same variant names across similar components
+   - Maintain consistent behavior for each variant
+   - Follow existing patterns for props and customization
+
+3. **Documentation**
+   - Document available variants
+   - Provide examples of common use cases
+   - Explain when to use each variant
+
+## Example Components
+
+Reference implementations:
+- [Button Component](mdc:src/components/ui/button.tsx) - Base component with variant system
+- [FlashcardListItem](mdc:src/components/FlashcardListItem.tsx) - Example of variant usage
+- [LoginForm](mdc:src/components/auth/LoginForm.tsx) - Form with consistent button styling

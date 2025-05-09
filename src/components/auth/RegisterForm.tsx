@@ -48,7 +48,7 @@ export default function RegisterForm() {
 
   if (success) {
     return (
-      <div className="text-center">
+      <div className="text-center" data-testid="register-success">
         <h3 className="text-xl font-semibold text-green-600 mb-4">Account created successfully!</h3>
         <a
           href="/login"
@@ -61,7 +61,7 @@ export default function RegisterForm() {
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="space-y-4">
+    <form noValidate onSubmit={handleSubmit} className="space-y-4" data-testid="register-form">
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
           Email

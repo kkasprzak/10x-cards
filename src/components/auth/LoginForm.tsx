@@ -48,7 +48,7 @@ export default function LoginForm() {
   };
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="space-y-4">
+    <form noValidate onSubmit={handleSubmit} className="space-y-4" data-testid="login-form">
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
           Email
