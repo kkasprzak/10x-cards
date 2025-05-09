@@ -1,99 +1,83 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../lib/services/auth.service";
 import { ErrorNotification } from "../ErrorNotification";
 import { Button } from "../ui/button";
 import type { LoginCredentials } from "../../types";
-import { ZodError } from "zod";
 
 export default function LoginForm() {
-  const [formData, setFormData] = useState<LoginCredentials>({
-    email: "",
-    password: "",
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginCredentials>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Add validation on input change
-  const validateField = (name: keyof LoginCredentials, value: string) => {
-    try {
-      loginSchema.shape[name].parse(value);
-      return null;
-    } catch (err) {
-      if (err instanceof ZodError) {
-        return err.errors[0].message;
-      }
-      return null;
+  const watchedEmail = watch("email");
+  const watchedPassword = watch("password");
+
+  useEffect(() => {
+    if (apiError) {
+      setApiError(null);
     }
-  };
+  }, [watchedEmail, watchedPassword, apiError]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    // Update form data
-    setFormData((prev) => {
-      const newData = { ...prev, [name]: value };
-      return newData;
-    });
-
-    // Clear error when user starts typing
-    setError(null);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsLoading(true);
-
+  const onSubmit: SubmitHandler<LoginCredentials> = async (data) => {
+    setApiError(null);
     try {
-      const validatedData = loginSchema.parse(formData);
-
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(validatedData),
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+        throw new Error(responseData.error || "Login failed");
       }
 
       window.location.href = "/generate";
     } catch (err) {
-      if (err instanceof ZodError) {
-        const errorMessages = err.errors.map((error) => error.message).join(", ");
-        setError(errorMessages);
-      } else {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      }
-    } finally {
-      setIsLoading(false);
+      setApiError(err instanceof Error ? err.message : "An unexpected error occurred");
     }
   };
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="space-y-4" data-testid="login-form">
+    <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-4" data-testid="login-form">
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
           Email
         </label>
         <input
           id="email"
-          name="email"
           type="email"
-          required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={formData.email}
-          onChange={handleInputChange}
-          onBlur={(e) => {
-            const fieldError = validateField("email", e.target.value);
-            if (fieldError) setError(fieldError);
-          }}
-          disabled={isLoading}
+          autoComplete="email"
+          className={`mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
+            errors.email
+              ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+          }`}
+          {...register("email")}
+          disabled={isSubmitting}
           data-test-id="login-email-input"
-          aria-invalid={error ? "true" : "false"}
+          aria-invalid={errors.email ? "true" : "false"}
+          aria-describedby={errors.email ? "email-error" : undefined}
         />
+        {errors.email && (
+          <p id="email-error" className="mt-1 text-xs text-red-600">
+            {errors.email.message}
+          </p>
+        )}
       </div>
 
       <div>
@@ -102,23 +86,27 @@ export default function LoginForm() {
         </label>
         <input
           id="password"
-          name="password"
           type="password"
-          required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={formData.password}
-          onChange={handleInputChange}
-          onBlur={(e) => {
-            const fieldError = validateField("password", e.target.value);
-            if (fieldError) setError(fieldError);
-          }}
-          disabled={isLoading}
+          autoComplete="current-password"
+          className={`mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
+            errors.password
+              ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+          }`}
+          {...register("password")}
+          disabled={isSubmitting}
           data-test-id="login-password-input"
-          aria-invalid={error ? "true" : "false"}
+          aria-invalid={errors.password ? "true" : "false"}
+          aria-describedby={errors.password ? "password-error" : undefined}
         />
+        {errors.password && (
+          <p id="password-error" className="mt-1 text-xs text-red-600">
+            {errors.password.message}
+          </p>
+        )}
       </div>
 
-      {error && <ErrorNotification message={error} onClose={() => setError(null)} />}
+      {apiError && <ErrorNotification message={apiError} onClose={() => setApiError(null)} />}
 
       <div className="flex items-center justify-between">
         <a href="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-500">
@@ -128,12 +116,12 @@ export default function LoginForm() {
 
       <Button
         type="submit"
-        disabled={isLoading}
+        disabled={isSubmitting}
         variant="default"
         className="w-full"
         data-test-id="login-submit-button"
       >
-        {isLoading ? "Signing in..." : "Sign in"}
+        {isSubmitting ? "Signing in..." : "Sign in"}
       </Button>
 
       <div className="text-center">

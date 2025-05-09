@@ -36,6 +36,11 @@ test.describe("Authentication flows", () => {
   });
 
   test("displays error for invalid credentials", async () => {
+    await test.step("navigate to home page", async () => {
+      await homePage.goto();
+      await homePage.expectTitleVisible();
+    });
+
     await test.step("navigate to login page", async () => {
       await loginPage.goto();
       await loginPage.expectFormVisible();
@@ -46,7 +51,7 @@ test.describe("Authentication flows", () => {
     });
 
     await test.step("verify error message", async () => {
-      await loginPage.expectErrorMessage("Invalid credentials");
+      await loginPage.expectErrorMessage("Invalid login credentials");
     });
   });
 

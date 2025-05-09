@@ -26,28 +26,29 @@ export class LoginPage {
   }
 
   async login(email: string, password: string) {
-    // Wypełnij formularz
+    await this.emailInput.waitFor({ state: "visible" });
+    await this.passwordInput.waitFor({ state: "visible" });
+    await this.submitButton.waitFor({ state: "visible" });
+
+    await this.emailInput.focus();
     await this.emailInput.fill(email);
+
+    await this.passwordInput.focus();
     await this.passwordInput.fill(password);
 
-    // Rozpocznij nasłuchiwanie na odpowiedź sieciową przed kliknięciem
     const responsePromise = this.page.waitForResponse(
       (response) => response.url().includes("/api/auth/login") && response.request().method() === "POST"
     );
 
-    // Kliknij przycisk logowania
-    await this.submitButton.click();
+    await expect(this.submitButton).toBeEnabled();
+    await Promise.all([this.submitButton.click(), this.page.waitForLoadState("domcontentloaded")]);
 
-    // Poczekaj na odpowiedź z API
     const response = await responsePromise;
 
     if (response.ok()) {
-      // Jeśli logowanie udane, czekaj na przekierowanie i załadowanie nowej strony
       await this.page.waitForURL("/generate");
-      // Dodatkowe czekanie na ustabilizowanie się strony
       await this.page.waitForLoadState("networkidle");
     } else {
-      // Jeśli błąd, czekaj na pojawienie się komunikatu
       await this.errorNotification.waitFor({ state: "visible", timeout: 5000 });
     }
   }

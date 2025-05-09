@@ -10,6 +10,6 @@ export const TEST_USER = {
 } as const;
 
 export const INVALID_USER = {
-  email: "invalid@example.com",
-  password: "WrongPassword123!",
+  email: "valid.but.wrong@example.com",
+  password: "ValidButWrong123!",
 } as const;
