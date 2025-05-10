@@ -8,12 +8,14 @@ export class HomePage {
   readonly page: Page;
   readonly title: Locator;
   readonly loginButton: Locator;
+  readonly signUpButton: Locator;
   // Add more locators as needed
 
   constructor(page: Page) {
     this.page = page;
-    this.title = page.locator("h1").first();
-    this.loginButton = page.locator("[data-test-id='header-login-button']");
+    this.title = page.getByRole("heading", { name: "Twórz fiszki szybciej z AI" });
+    this.loginButton = page.getByRole("link", { name: "Login" });
+    this.signUpButton = page.getByRole("link", { name: "Sign up" });
     // Initialize more locators as needed
   }
 
@@ -29,6 +31,10 @@ export class HomePage {
     await this.loginButton.click();
     // Wait for navigation to complete
     await this.page.waitForURL("/login");
+  }
+
+  async clickSignUp() {
+    await this.signUpButton.click();
   }
 
   // Add more page-specific methods as needed
