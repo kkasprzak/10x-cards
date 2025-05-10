@@ -1,4 +1,4 @@
-# 10x-cards
+# Awesomee 10x-cards
 
 ## Project Description
 
