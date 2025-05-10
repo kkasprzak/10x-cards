@@ -26,10 +26,8 @@ export default function LoginForm() {
   const watchedPassword = watch("password");
 
   useEffect(() => {
-    if (apiError) {
-      setApiError(null);
-    }
-  }, [watchedEmail, watchedPassword, apiError]);
+    setApiError(null);
+  }, [watchedEmail, watchedPassword]);
 
   const onSubmit: SubmitHandler<LoginCredentials> = async (data) => {
     setApiError(null);
