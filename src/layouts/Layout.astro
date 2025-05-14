@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { Toaster } from "@/components/ui/sonner";
 
 interface Props {
   title?: string;
@@ -27,6 +28,7 @@ const { title = "10x Astro Starter", isMinimal = false, isAuthenticated = false 
       <slot />
     </main>
     {!isMinimal && <Footer />}
+    <Toaster client:load />
   </body>
 </html>
 

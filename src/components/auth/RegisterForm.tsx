@@ -1,29 +1,29 @@
 import { useState } from "react";
-import { registerSchema } from "../../lib/services/auth.service";
-import { Button } from "../ui/button";
-import type { RegisterCredentials } from "../../types";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerFormSchema, type RegisterFormData } from "@/lib/schemas/auth.schema";
+import { toast } from "sonner";
+
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function RegisterForm() {
-  const [formData, setFormData] = useState<RegisterCredentials>({
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const form = useForm<RegisterFormData>({
+    resolver: zodResolver(registerFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    // Client-side validation
-    const result = registerSchema.safeParse(formData);
-    if (!result.success) {
-      setError(result.error.issues[0].message);
-      return;
-    }
-
+  const onSubmit = async (formData: RegisterFormData) => {
     try {
+      setIsLoading(true);
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
@@ -35,25 +35,31 @@ export default function RegisterForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Registration failed");
+        toast.error("Registration failed", {
+          description: data.error || "An unexpected error occurred",
+        });
         return;
       }
 
-      setSuccess(true);
-      setFormData({ email: "", password: "", confirmPassword: "" });
-    } catch {
-      setError("An error occurred during registration");
+      setSubmitted(true);
+      toast.success("Account created!", {
+        description: "You can now sign in with your credentials.",
+      });
+    } catch (error) {
+      toast.error("Error", {
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (success) {
+  if (submitted) {
     return (
-      <div className="text-center" data-testid="register-success">
-        <h3 className="text-xl font-semibold text-green-600 mb-4">Account created successfully!</h3>
-        <a
-          href="/login"
-          className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-        >
+      <div className="text-center space-y-4" data-testid="register-success">
+        <h3 className="text-2xl font-bold tracking-tight">Account created successfully!</h3>
+        <p className="mt-2 text-sm text-gray-600">You can now sign in with your new account.</p>
+        <a href="/login" className="text-sm text-indigo-600 hover:text-indigo-500 block">
           Sign in
         </a>
       </div>
@@ -61,64 +67,66 @@ export default function RegisterForm() {
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="space-y-4" data-testid="register-form">
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate data-testid="register-form">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  disabled={isLoading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input type="password" autoComplete="new-password" disabled={isLoading} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-          Confirm Password
-        </label>
-        <input
-          id="confirmPassword"
-          type="password"
-          required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={formData.confirmPassword}
-          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input type="password" autoComplete="new-password" disabled={isLoading} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      {error && (
-        <div data-testid="form-error" className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md p-3">
-          {error}
+        <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500" disabled={isLoading}>
+          {isLoading ? "Creating account..." : "Create account"}
+        </Button>
+
+        <div className="text-center">
+          <a href="/login" className="text-sm text-indigo-600 hover:text-indigo-500">
+            Already have an account? Sign in
+          </a>
         </div>
-      )}
-
-      <Button type="submit" variant="default" className="w-full">
-        Sign up
-      </Button>
-
-      <div className="text-center">
-        <a href="/login" className="text-sm text-indigo-600 hover:text-indigo-500">
-          Already have an account? Sign in
-        </a>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 }

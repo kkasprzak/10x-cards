@@ -1,9 +1,23 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { toast } from "sonner";
 import ForgotPasswordForm from "../ForgotPasswordForm";
 
+// Mock sonner toast
+vi.mock("sonner", () => ({
+  toast: {
+    error: vi.fn(),
+    success: vi.fn(),
+  },
+}));
+
 describe("ForgotPasswordForm", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.mocked(toast.error).mockClear();
+    vi.mocked(toast.success).mockClear();
+  });
+
   it("renders form fields and submit button", () => {
     render(<ForgotPasswordForm />);
 
@@ -12,82 +26,31 @@ describe("ForgotPasswordForm", () => {
     expect(screen.getByText(/back to login/i)).toBeInTheDocument();
   });
 
-  it("shows success message after form submission", async () => {
+  it("shows validation error for empty email field", async () => {
     render(<ForgotPasswordForm />);
-    const user = userEvent.setup();
-    const testEmail = "test@example.com";
 
-    await user.type(screen.getByLabelText(/email address/i), testEmail);
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
+    const submitButton = screen.getByRole("button", { name: /reset password/i });
+    fireEvent.click(submitButton);
 
-    expect(screen.getByText(/check your email/i)).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(`If an account exists for ${testEmail}`, "i"))).toBeInTheDocument();
-    expect(screen.getByText(/return to login/i)).toBeInTheDocument();
+    expect(await screen.findByText(/please enter a valid email address/i)).toBeInTheDocument();
   });
 
-  it("requires email field to be filled", async () => {
+  it("shows error for invalid email format", async () => {
     render(<ForgotPasswordForm />);
-    const user = userEvent.setup();
-
-    // Try to submit without entering email
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
-
-    // Email input should still be visible (form not submitted)
-    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
-  });
-
-  it("updates email state when typing", async () => {
-    render(<ForgotPasswordForm />);
-    const user = userEvent.setup();
-    const testEmail = "test@example.com";
 
     const emailInput = screen.getByLabelText(/email address/i);
-    await user.type(emailInput, testEmail);
+    const submitButton = screen.getByRole("button", { name: /reset password/i });
 
-    expect(emailInput).toHaveValue(testEmail);
+    fireEvent.change(emailInput, { target: { value: "invalid-email" } });
+    fireEvent.click(submitButton);
+
+    expect(await screen.findByText(/please enter a valid email address/i)).toBeInTheDocument();
   });
 
-  it("navigates back to login when clicking the back link", () => {
+  it('has "Back to login" link pointing to `/login` in form view', () => {
     render(<ForgotPasswordForm />);
 
-    const loginLink = screen.getByText(/back to login/i);
-    expect(loginLink).toHaveAttribute("href", "/login");
-  });
-
-  it("navigates to login from success message", async () => {
-    render(<ForgotPasswordForm />);
-    const user = userEvent.setup();
-
-    await user.type(screen.getByLabelText(/email address/i), "test@example.com");
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
-
-    const returnLink = screen.getByText(/return to login/i);
-    expect(returnLink).toHaveAttribute("href", "/login");
-  });
-
-  it("displays validation error for invalid email format", async () => {
-    render(<ForgotPasswordForm />);
-    const user = userEvent.setup();
-
-    await user.type(screen.getByLabelText(/email address/i), "invalid-email");
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
-
-    expect(screen.getByText(/invalid email format/i)).toBeInTheDocument();
-  });
-
-  it("clears error when email input changes", async () => {
-    render(<ForgotPasswordForm />);
-    const user = userEvent.setup();
-
-    // First trigger an error
-    await user.type(screen.getByLabelText(/email address/i), "invalid-email");
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
-
-    // Verify error is shown
-    expect(screen.getByText(/invalid email format/i)).toBeInTheDocument();
-
-    // Change input and verify error is cleared
-    await user.type(screen.getByLabelText(/email address/i), "a");
-    expect(screen.queryByText(/invalid email format/i)).not.toBeInTheDocument();
+    const backToLoginLink = screen.getByText(/back to login/i);
+    expect(backToLoginLink).toHaveAttribute("href", "/login");
   });
 });

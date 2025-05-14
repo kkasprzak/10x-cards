@@ -1,82 +1,90 @@
 import { useState } from "react";
-import { z } from "zod";
-import { ErrorNotification } from "../ErrorNotification";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { forgotPasswordFormSchema, type ForgotPasswordFormData } from "@/lib/schemas/auth.schema";
+import { toast } from "sonner";
 
-const forgotPasswordSchema = z.object({
-  email: z.string().email("Invalid email format"),
-});
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function ForgotPasswordForm() {
-  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [submittedEmail, setSubmittedEmail] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const form = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordFormSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
 
+  const onSubmit = async (formData: ForgotPasswordFormData) => {
     try {
-      forgotPasswordSchema.parse({ email });
-      setSubmitted(true);
+      setIsLoading(true);
       // Form submission will be handled later
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        setError(err.errors[0].message);
-      } else {
-        setError("An unexpected error occurred");
-      }
+      setSubmittedEmail(formData.email);
+      setSubmitted(true);
+      toast.success("Check your email", {
+        description: "If an account exists, you will receive password reset instructions.",
+      });
+    } catch (error) {
+      toast.error("Error", {
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+      });
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    setError(null);
   };
 
   if (submitted) {
     return (
       <div className="text-center space-y-4">
-        <h3 className="text-lg font-medium text-gray-900">Check your email</h3>
-        <p className="text-sm text-gray-600">
-          If an account exists for {email}, you will receive password reset instructions.
+        <h3 className="text-2xl font-bold tracking-tight">Check your email</h3>
+        <p className="mt-2 text-sm text-gray-600">
+          If an account exists for {submittedEmail}, you will receive password reset instructions.
         </p>
         <a href="/login" className="text-sm text-indigo-600 hover:text-indigo-500 block">
-          Return to login
+          Back to login
         </a>
       </div>
     );
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email address
-        </label>
-        <input
-          id="email"
-          type="email"
-          required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          value={email}
-          onChange={handleInputChange}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-4" noValidate>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email address</FormLabel>
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  disabled={isLoading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      {error && <ErrorNotification message={error} onClose={() => setError(null)} />}
+        <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500" disabled={isLoading}>
+          {isLoading ? "Sending..." : "Reset password"}
+        </Button>
 
-      <button
-        type="submit"
-        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
-        Reset password
-      </button>
-
-      <div className="text-center">
-        <a href="/login" className="text-sm text-indigo-600 hover:text-indigo-500">
-          Back to login
-        </a>
-      </div>
-    </form>
+        <div className="text-center">
+          <a href="/login" className="text-sm text-indigo-600 hover:text-indigo-500">
+            Back to login
+          </a>
+        </div>
+      </form>
+    </Form>
   );
 }

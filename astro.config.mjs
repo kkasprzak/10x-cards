@@ -40,5 +40,10 @@ export default defineConfig({
     ssr: {
       external: ["crypto"],
     },
+    resolve: {
+      alias: {
+        "@": "/src",
+      },
+    },
   },
 });

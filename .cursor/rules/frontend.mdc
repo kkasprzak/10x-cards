@@ -10,6 +10,13 @@ alwaysApply: false
 - Use Astro components (.astro) for static content and layout
 - Implement framework components in React only when interactivity is needed
 
+### Form Validation
+
+- Keep frontend form schemas in `src/lib/schemas/*.schema.ts`
+- Use Zod for form validation with React Hook Form
+- Frontend schemas should focus on UX and immediate feedback
+- Use separate types for forms (z.infer) and API (interfaces from types.ts)
+
 ### Guidelines for Styling
 
 #### Tailwind
