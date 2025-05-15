@@ -14,11 +14,11 @@ export class LoginPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.emailInput = page.locator("[data-test-id='login-email-input']");
-    this.passwordInput = page.locator("[data-test-id='login-password-input']");
-    this.submitButton = page.locator("[data-test-id='login-submit-button']");
-    this.form = page.locator("[data-testid='login-form']");
-    this.errorNotification = page.locator("[role='alert']");
+    this.emailInput = page.getByLabel(/email/i);
+    this.passwordInput = page.getByLabel(/^password$/i);
+    this.submitButton = page.getByRole("button", { name: /sign in/i });
+    this.form = page.getByTestId("login-form");
+    this.errorNotification = page.getByRole("alert");
   }
 
   async goto() {
@@ -32,9 +32,11 @@ export class LoginPage {
 
     await this.emailInput.focus();
     await this.emailInput.fill(email);
+    await expect(this.emailInput).toHaveValue(email);
 
     await this.passwordInput.focus();
     await this.passwordInput.fill(password);
+    await expect(this.passwordInput).toHaveValue(password);
 
     const responsePromise = this.page.waitForResponse(
       (response) => response.url().includes("/api/auth/login") && response.request().method() === "POST"

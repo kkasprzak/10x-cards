@@ -473,3 +473,21 @@ describe("RegisterForm", () => {
 - Comprehensive error handling
 - Reduced boilerplate code
 - Better maintainability 
+
+### 5. Client-Side API Services
+
+To further improve separation of concerns and reusability, client-side logic for API communication should be placed in a dedicated directory. Considering the existing project structure (`src/lib` for "Services and helpers") and the need to distinguish client-side services from potential backend services, the following location is proposed for client-side specific services:
+
+- **`src/lib/client/services/`**
+  - Files within this directory should follow the established naming convention, e.g., `feature.service.ts` (lowercase, dot-separated).
+  - Example for an authentication client service: `src/lib/client/services/auth.service.ts` (if distinct from a backend auth service) or `src/lib/client/services/auth-api.service.ts`.
+  - Example for a product client service: `src/lib/client/services/product.service.ts`.
+
+**Reasoning:**
+- **Clarity**: The `client` sub-directory clearly demarcates services intended for frontend use, separating them from any backend/shared services that might reside directly in `src/lib/services/`.
+- **Organization**: The `services` sub-directory within `client` keeps all client-side API interaction logic grouped.
+- **Naming Convention**: Adhering to `feature.service.ts` ensures consistency with existing services like `src/lib/services/auth.service.ts`.
+- **Scalability**: Allows for easy addition of new client-side services as the application grows.
+- **Consistency**: Aligns with the general use of `src/lib` for shared utilities and helpers, while providing a more specific scope for client-side API logic.
+
+This structure helps in keeping components cleaner, as they would import and use these services rather than implementing `fetch` calls directly. It also facilitates easier testing of the API logic independently. 

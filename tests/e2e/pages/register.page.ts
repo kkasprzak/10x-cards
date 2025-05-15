@@ -15,10 +15,10 @@ export class RegisterPage {
     this.form = page.getByTestId("register-form");
 
     // Use form as a context for input fields to ensure we're targeting elements within the form
-    this.emailInput = this.form.locator("#email");
-    this.passwordInput = this.form.locator("#password");
-    this.confirmPasswordInput = this.form.locator("#confirmPassword");
-    this.signUpButton = this.form.getByRole("button", { name: "Sign up" });
+    this.emailInput = this.form.getByLabel(/email/i);
+    this.passwordInput = this.form.getByLabel(/^password$/i);
+    this.confirmPasswordInput = this.form.getByLabel(/confirm password/i);
+    this.signUpButton = this.form.getByRole("button", { name: /create account/i });
     this.successMessage = page.getByTestId("register-success");
     this.errorNotification = page.getByTestId("form-error");
   }
@@ -38,15 +38,20 @@ export class RegisterPage {
     await this.confirmPasswordInput.waitFor({ state: "visible" });
     await this.signUpButton.waitFor({ state: "visible" });
 
-    // Fill the form with focus events
+    // Fill and verify email
     await this.emailInput.focus();
     await this.emailInput.fill(email);
+    await expect(this.emailInput).toHaveValue(email);
 
+    // Fill and verify password
     await this.passwordInput.focus();
     await this.passwordInput.fill(password);
+    await expect(this.passwordInput).toHaveValue(password);
 
+    // Fill and verify confirm password
     await this.confirmPasswordInput.focus();
     await this.confirmPasswordInput.fill(password);
+    await expect(this.confirmPasswordInput).toHaveValue(password);
 
     // Wait for API response
     const responsePromise = this.page.waitForResponse(
