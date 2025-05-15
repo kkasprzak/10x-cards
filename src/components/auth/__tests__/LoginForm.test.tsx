@@ -7,7 +7,7 @@ describe("LoginForm", () => {
     render(<LoginForm />);
 
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
     expect(screen.getByText(/forgot your password/i)).toBeInTheDocument();
   });
@@ -26,7 +26,7 @@ describe("LoginForm", () => {
     render(<LoginForm />);
 
     const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    const passwordInput = screen.getByLabelText(/^password$/i);
     const submitButton = screen.getByRole("button", { name: /sign in/i });
 
     fireEvent.change(emailInput, { target: { value: "invalid-email" } });
@@ -34,6 +34,20 @@ describe("LoginForm", () => {
     fireEvent.click(submitButton);
 
     expect(await screen.findByText(/invalid email format/i)).toBeInTheDocument();
+  });
+
+  it("shows error for password too short", async () => {
+    render(<LoginForm />);
+
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/^password$/i);
+    const submitButton = screen.getByRole("button", { name: /sign in/i });
+
+    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+    fireEvent.change(passwordInput, { target: { value: "12345" } });
+    fireEvent.click(submitButton);
+
+    expect(await screen.findByText(/password must be at least 6 characters/i)).toBeInTheDocument();
   });
 
   it('has "Forgot your password?" link pointing to `/forgot-password`', () => {
