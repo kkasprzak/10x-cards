@@ -19,7 +19,6 @@
      - `limit` (optional)
      - `sort` (optional e.g., `created_at`)
      - `order` (optional e.g., `asc` or `desc`)
-     - Optional filters (e.g., `source`, `generation_id`).
    - **Response**:
    - **Response**:
      ```json

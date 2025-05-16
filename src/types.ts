@@ -4,10 +4,7 @@ export type Flashcard = Database["public"]["Tables"]["flashcards"]["Row"];
 export type Generation = Database["public"]["Tables"]["generations"]["Row"];
 export type GenerationErrorLog = Database["public"]["Tables"]["generation_error_logs"]["Row"];
 
-export type FlashcardDto = Pick<
-  Flashcard,
-  "id" | "front" | "back" | "source" | "generation_id" | "created_at" | "updated_at"
->;
+export type FlashcardDto = Pick<Flashcard, "id" | "front" | "back" | "source" | "created_at" | "updated_at">;
 
 export interface PaginationDto {
   page: number;

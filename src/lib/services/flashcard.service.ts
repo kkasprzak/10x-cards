@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { FlashcardCreateDto, FlashcardDto } from "../../types";
+import type { FlashcardCreateDto, FlashcardDto, FlashcardsListResponseDto, PaginationDto } from "../../types";
+import type { FlashcardsListQueryParams } from "../validators/flashcard.validator";
 
 export interface FlashcardCreationResult {
   success: FlashcardDto[];
@@ -50,5 +51,43 @@ export class FlashcardService {
     }
 
     return result;
+  }
+
+  async getUserFlashcards(params: FlashcardsListQueryParams): Promise<FlashcardsListResponseDto> {
+    const { page, limit, sort, order } = params;
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
+
+    const { data, count, error } = await this.supabase
+      .from("flashcards")
+      .select("*", { count: "exact" })
+      .eq("user_id", this.userId)
+      .range(start, end)
+      .order(sort, { ascending: order === "asc" });
+
+    if (error) {
+      throw new Error(`Failed to fetch flashcards: ${error.message}`);
+    }
+
+    const flashcards: FlashcardDto[] =
+      data?.map((card) => ({
+        id: card.id,
+        front: card.front,
+        back: card.back,
+        source: card.source,
+        created_at: card.created_at,
+        updated_at: card.updated_at,
+      })) ?? [];
+
+    const pagination: PaginationDto = {
+      page,
+      limit,
+      total: count ?? 0,
+    };
+
+    return {
+      data: flashcards,
+      pagination,
+    };
   }
 }
