@@ -32,3 +32,12 @@ export const flashcardsCreateCommandSchema = z.object({
     .min(1, "At least one flashcard is required")
     .max(100, "Cannot create more than 100 flashcards at once"),
 });
+
+export const flashcardsListQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional().default(1).describe("Page number (≥1)"),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(10).describe("Items per page (1-100)"),
+  sort: z.enum(["created_at", "updated_at"]).optional().default("created_at").describe("Sort column"),
+  order: z.enum(["asc", "desc"]).optional().default("desc").describe("Sort order"),
+});
+
+export type FlashcardsListQueryParams = z.infer<typeof flashcardsListQuerySchema>;

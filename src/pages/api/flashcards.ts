@@ -1,12 +1,11 @@
 import type { APIRoute } from "astro";
 import { FlashcardService } from "../../lib/services/flashcard.service";
-import { flashcardsCreateCommandSchema } from "../../lib/validators/flashcard.validator";
+import { flashcardsCreateCommandSchema, flashcardsListQuerySchema } from "../../lib/validators/flashcard.validator";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    // Ensure user is authenticated
     if (!locals.user?.id) {
       return new Response(
         JSON.stringify({
@@ -61,10 +60,64 @@ export const POST: APIRoute = async ({ request, locals }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // Return error response without logging
     return new Response(
       JSON.stringify({
         error: "Internal server error",
+        message: error instanceof Error ? error.message : "Unknown error",
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+};
+
+export const GET: APIRoute = async ({ request, locals }) => {
+  try {
+    if (!locals.user?.id) {
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "You must be logged in to view flashcards",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const url = new URL(request.url);
+    const queryParams = Object.fromEntries(url.searchParams);
+
+    const validationResult = flashcardsListQuerySchema.safeParse(queryParams);
+    if (!validationResult.success) {
+      return new Response(
+        JSON.stringify({
+          error: "Invalid query parameters",
+          details: validationResult.error.errors,
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const flashcardService = new FlashcardService(locals.supabase, locals.user.id);
+    const response = await flashcardService.getUserFlashcards(validationResult.data);
+
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: "Internal Server Error",
         message: error instanceof Error ? error.message : "Unknown error",
       }),
       {

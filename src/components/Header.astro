@@ -1,6 +1,7 @@
 ---
 import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/components/LogoutButton";
+import { MainNavigation } from "@/components/MainNavigation";
 
 interface Props {
   variant: "minimal" | "full";
@@ -12,7 +13,12 @@ const { variant, isAuthenticated = false } = Astro.props;
 
 <header class="border-b" data-testid="header">
   <nav class="container mx-auto px-4 h-16 flex items-center justify-between">
-    <a href="/" class="font-semibold text-lg">10x Cards</a>
+    <div class="flex items-center space-x-12">
+      <a href="/" class="font-semibold text-lg">10x Cards</a>
+      <div>
+        {isAuthenticated && <MainNavigation client:load />}
+      </div>
+    </div>
     {
       variant === "full" && (
         <div class="space-x-2">
